@@ -1,0 +1,7 @@
+node_modules
+dist
+out
+.DS_Store
+*.log*
+# CodeGraph 本地索引，可随时重建，不入库
+.codegraph/
