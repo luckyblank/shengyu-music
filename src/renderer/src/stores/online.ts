@@ -37,12 +37,6 @@ const cacheKey = computed(() => `${activeGenre.value}|${activePeriod.value}`)
 
 export const currentChart = computed<ChartResult | null>(() => charts.value[cacheKey.value] ?? null)
 
-/** 一句话描述当前榜单，给发现页卡片与标题用。 */
-export const currentChartNote = computed(() => {
-  const chart = currentChart.value
-  return chart ? `${chart.genreLabel} · ${chart.periodLabel}` : '实时更新'
-})
-
 /** 拉取当前流派 + 周期的榜单；已有缓存且非强制刷新时直接复用。 */
 export async function loadChart(force = false): Promise<void> {
   const key = cacheKey.value

@@ -234,7 +234,7 @@ input {
 button {
   border: 0;
   /* Chromium 给按钮的默认底色是 ButtonFace（#f0f0f0）——没写背景的按钮在深色主题下
-     就是一块发白的浅灰，HotSearchList 的热搜行、DailyView 的 Tab 都栽在这上面。
+     就是一块发白的浅灰，热搜榜的热搜行、DailyView 的 Tab 都栽在这上面。
      设计体系里每个按钮的背景都自己声明，所以这里统一清掉，别再让 UA 底色漏出来。 */
   background-color: transparent;
   cursor: pointer;

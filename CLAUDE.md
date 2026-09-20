@@ -4,7 +4,7 @@
 
 ## 项目
 
-声屿音乐 —— 基于 Electron + Vue 3 + TypeScript、由 electron-vite 构建的桌面音乐播放器。界面文案、代码注释与文档一律使用简体中文，修改时请保持一致。本仓库**未初始化 git**，也**没有测试套件**（无 vitest/jest/playwright，无 `test` 脚本）—— 验证靠手动运行 `npm run dev`。
+声屿音乐 —— 基于 Electron + Vue 3 + TypeScript、由 electron-vite 构建的桌面音乐播放器。界面文案、代码注释与文档一律使用简体中文，修改时请保持一致。本仓库已初始化为 git 仓库（远程 `luckyblank/shengyu-music`，默认分支 `main`；提交署名见[提交约定](#提交约定)），但**没有测试套件**（无 vitest/jest/playwright，无 `test` 脚本）—— 验证靠手动运行 `npm run dev`。
 
 有几处「缺失」是刻意的，不是待办：没有 vue-router、没有 Pinia、没有 SQLite —— 项目规划的原则是「不提前加依赖」，V1 的实施计划明确否决了这三者。除非用户要求改变，否则继续使用现有的 `activePage` ref、模块级 ref 与 `state.json`。
 
@@ -159,6 +159,12 @@ source → bus → EQ（5 段 peaking：60/250/1k/4k/12k）→ masterGain → fx
 - Prettier：不加分号、单引号、100 列、无尾逗号、2 空格缩进、LF（[.prettierrc.yaml](.prettierrc.yaml)、[.editorconfig](.editorconfig)）。
 - 注释用简体中文且解释**为什么** —— 常常直接点出这一行在防的是哪个具体故障（例如「响应式代理无法跨 contextBridge 克隆，必须展开为普通数组」）。保持这个风格；单纯复述代码不是本仓库的写法。
 - window 上的全局类型声明在 `stores/ui.ts` 的 `declare global` 里 —— 扩展它，不要动辄用 `any`。
+
+## 提交约定
+
+- **提交一律用本机身份署名**：作者与提交者都取 `git config user.name` / `user.email`（本仓库为 `luckyblank <luckyblank@163.com>`）。不要用 `--author` 把身份改成工具或别人 —— 提交历史该记的是真人。
+- **提交信息里不要加 `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>` 或任何同类的协作者尾巴**，工具不算协作者。
+- 已经推到 `origin/main` 的提交，不要为了去掉尾巴去改写历史（那需要 force push）—— 先问用户。
 
 ## 文档地图
 

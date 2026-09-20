@@ -380,7 +380,14 @@ function persist(): void {
         genres: { ...playStats.value.genres },
         artists: { ...playStats.value.artists }
       },
-      chartSnapshots: { ...chartSnapshots.value }
+      // 浅展开不够：每份快照里的 ranks 仍是响应式代理，saveState 会抛
+      // 「An object could not be cloned.」，导致整份状态写不进去（首次打开榜单必现）
+      chartSnapshots: Object.fromEntries(
+        Object.entries(chartSnapshots.value).map(([key, snapshot]) => [
+          key,
+          { date: snapshot.date, ranks: { ...snapshot.ranks } }
+        ])
+      )
     })
   }, 300)
 }

@@ -3,5 +3,7 @@ dist
 out
 .DS_Store
 *.log*
+# tsc/vue-tsc 的增量编译缓存，每次构建都会重建，不入库
+*.tsbuildinfo
 # CodeGraph 本地索引，可随时重建，不入库
 .codegraph/

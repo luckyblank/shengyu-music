@@ -1,6 +1,6 @@
 {
   "name": "shengyu-music",
-  "version": "1.5.1",
+  "version": "1.0.2",
   "description": "声屿音乐桌面播放器",
   "main": "./out/main/index.js",
   "author": "example.com",

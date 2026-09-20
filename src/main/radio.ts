@@ -45,6 +45,18 @@ const GENRE_GROUPS: Record<string, string> = {
   eclectic: '精选'
 }
 
+/**
+ * 只补**标签**、不参与归组的映射。
+ *
+ * 这两个词（industrial / live）故意不放进 GENRE_GROUPS：那会改变 primaryGenre 的结果
+ * （它们现在都落回「精选」），把分组数量整体打乱。但卡片标签上直接印英文原词很突兀，
+ * 所以在这里补一份中文。
+ */
+const EXTRA_GENRE_LABELS: Record<string, string> = {
+  industrial: '工业',
+  live: '现场'
+}
+
 /** 分组展示顺序：内容优先，杂项靠后。 */
 const GROUP_ORDER = [
   '氛围',
@@ -99,7 +111,10 @@ function primaryGenre(raw: string): string {
 function genreLabels(raw: string): string[] {
   const labels = raw
     .split('|')
-    .map((item) => GENRE_GROUPS[item.trim().toLowerCase()] ?? item.trim())
+    .map((item) => {
+      const key = item.trim().toLowerCase()
+      return GENRE_GROUPS[key] ?? EXTRA_GENRE_LABELS[key] ?? item.trim()
+    })
     .filter((item) => item.length > 0)
   return [...new Set(labels)]
 }

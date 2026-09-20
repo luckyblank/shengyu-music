@@ -72,6 +72,12 @@ defineProps<{ name: string; size?: number; strokeWidth?: number }>()
       <circle cx="12" cy="12" r="1" fill="currentColor" stroke="none" />
       <circle cx="19" cy="12" r="1" fill="currentColor" stroke="none" />
     </template>
+    <!-- 设计稿头图里的 ⋯ 点径 6.5、中心距 10.75（72px 尺寸下），比上面的 more 紧凑得多 -->
+    <template v-else-if="name === 'more-tight'">
+      <circle cx="8.4" cy="12" r="1.08" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.08" fill="currentColor" stroke="none" />
+      <circle cx="15.6" cy="12" r="1.08" fill="currentColor" stroke="none" />
+    </template>
     <template v-else-if="name === 'chevron-left'"><path d="m15 18-6-6 6-6" /></template>
     <template v-else-if="name === 'chevron-right'"><path d="m9 18 6-6-6-6" /></template>
     <template v-else-if="name === 'chevron-up'"><path d="m18 15-6-6-6 6" /></template>
@@ -202,6 +208,11 @@ defineProps<{ name: string; size?: number; strokeWidth?: number }>()
     <template v-else-if="name === 'trend'">
       <path d="M4 16.5 9 11l3.6 3.4L20 7" />
       <path d="M15.4 7H20v4.6" />
+    </template>
+    <template v-else-if="name === 'headphones'">
+      <path d="M4 18.6v-5.4a8 8 0 0 1 16 0v5.4" />
+      <rect x="4" y="13.2" width="3.9" height="5.4" rx="1.4" />
+      <rect x="16.1" y="13.2" width="3.9" height="5.4" rx="1.4" />
     </template>
     <template v-else-if="name === 'note'">
       <path d="M9 17V6.4l9-1.7v9.5" />

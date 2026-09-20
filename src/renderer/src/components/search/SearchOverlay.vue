@@ -1,24 +1,31 @@
 <script setup lang="ts">
 import { watch } from 'vue'
-import EmotionTags from './EmotionTags.vue'
-import HotSearchList from './HotSearchList.vue'
-import RecentListen from './RecentListen.vue'
+import AppIcon from '../AppIcon.vue'
+import GuessYouSearch from './GuessYouSearch.vue'
+import HotBoard from './HotBoard.vue'
 import RecentSearch from './RecentSearch.vue'
-import RecommendSongs from './RecommendSongs.vue'
-import SearchResults from './SearchResults.vue'
-import { dismissSearch, normalizedQuery } from '../../composables/useSearchDiscovery'
+import RisingList from './RisingList.vue'
+import SearchBanner from './SearchBanner.vue'
+import SuggestList from './SuggestList.vue'
+import {
+  dismissSearch,
+  normalizedQuery,
+  openAllResults
+} from '../../composables/useSearchDiscovery'
 import * as online from '../../stores/online'
 import * as ui from '../../stores/ui'
 
 /**
  * 搜索浮层 —— 点击搜索框后展开的那一整块。
  *
- * 三个约束决定了实现方式：
+ * 四个约束决定了实现方式：
  *   1. 必须是 Teleport。main.css 给 .topbar 上了 backdrop-filter，它会让顶栏成为
  *      固定定位后代的包含块，浮层若留在顶栏里就会按顶栏的坐标去定位。
  *   2. 遮罩只盖顶栏以下。搜索框本身要保持可输入，点一下遮罩就收起来会让人没法改关键词。
- *   3. 内容自上而下是一条「发现流」：最近搜索 → 猜你喜欢 → 热门搜索 → 可能喜欢 → 最近听过。
- *      没有输入时展示这些，有输入时换成实时结果 —— 同一块区域，两种状态。
+ *   3. 没有输入时是四块浏览器：猜你想搜 → 热搜榜 / 飙升榜 → 最近搜索 / 搜索建议 → 探索横幅；
+ *      有输入时换成分类建议加一句「查看全部结果」—— 同一块区域，两种状态。
+ *   4. 两列布局而不是一条竖向流：浮层高度上限 680px，竖排会把最下面的搜索建议
+ *      推到滚动条以下，而它恰恰是有输入时最该先看到的东西。
  */
 
 // 榜单是热门搜索的数据来源。只在浮层真正展开时才拉：它常驻在 App 里，
@@ -38,13 +45,26 @@ watch(
       <div v-if="ui.searchOpen.value" class="search-layer">
         <div class="search-scrim" @click="dismissSearch()"></div>
         <section class="search-panel" role="dialog" aria-label="搜索与发现">
-          <SearchResults v-if="normalizedQuery" />
+          <!-- 有输入：五个分类的实时建议，最后一句把人送去完整结果页 -->
+          <template v-if="normalizedQuery">
+            <SuggestList />
+            <button class="all-results" @click="openAllResults()">
+              查看「{{ ui.searchQuery.value.trim() }}」的全部结果
+              <AppIcon name="arrow" :size="14" />
+            </button>
+          </template>
+
           <template v-else>
-            <RecentSearch />
-            <EmotionTags />
-            <HotSearchList />
-            <RecommendSongs />
-            <RecentListen />
+            <GuessYouSearch />
+            <div class="grid">
+              <HotBoard />
+              <RisingList />
+            </div>
+            <div class="grid">
+              <RecentSearch />
+              <SuggestList />
+            </div>
+            <SearchBanner />
           </template>
         </section>
       </div>
@@ -90,6 +110,37 @@ watch(
   background: var(--surface);
   box-shadow: var(--shadow-overlay);
   pointer-events: auto;
+}
+
+/* 两列等宽：左列是「榜」与「记录」，右列是「升」与「建议」，各自独立成块 */
+.grid {
+  display: grid;
+  gap: 0 22px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-bottom: 20px;
+}
+/* 用一条竖分隔线代替卡片：浮层里已经有三层背景色，再叠卡片会太碎 */
+.grid > * + * {
+  padding-left: 22px;
+  border-left: 1px solid var(--divider);
+}
+
+.all-results {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--r-md);
+  color: var(--brand);
+  background: var(--brand-soft);
+  font-size: 13px;
+  transition: background var(--dur-1) ease;
+}
+.all-results:hover {
+  background: var(--surface-hover);
 }
 
 /* 内容逐块淡入：整块一起弹出会像「换了个页面」，逐块出来才像在陆续递东西给你 */

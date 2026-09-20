@@ -32,6 +32,9 @@ const emit = defineEmits<{ action: [] }>()
 <template>
   <div class="section-heading" :class="`heading-${size}`">
     <div class="heading-main">
+      <!-- mark 插槽：少数页面（电台）的设计稿在标题前有一枚图形标记，
+           标记的图片来源由调用方决定，避免这个共用组件依赖某个页面的资源 -->
+      <slot name="mark"></slot>
       <AppIcon v-if="icon" :name="icon" :size="size === 'sm' ? 14 : 16" />
       <h2>{{ title }}</h2>
       <span v-if="note" class="heading-note" :class="`note-${noteTone}`">{{ note }}</span>

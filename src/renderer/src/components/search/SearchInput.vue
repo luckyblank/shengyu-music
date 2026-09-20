@@ -13,6 +13,11 @@ import * as ui from '../../stores/ui'
  *
  * 展开同时挂在 focus 与 click 上。只监听 focus 会漏一种情况：回车进结果页后
  * 输入框仍是焦点元素，用户再点它不会触发 focus，浮层就再也打不开了。
+ *
+ * ESC 徽标必须留在 <label> 之外：label 的激活行为会把落在它内部任何位置的真实
+ * 鼠标点击重新派发到被标注的 input 上，徽标因此永远收不到自己的 click ——
+ * 点下去只会触发 input 的 openIfClosed，浮层关不掉。kbd 徽标与 ESC 徽标同占一列，
+ * 一并放到外面，行的结构不变。
  */
 
 const openIfClosed = (): void => {
@@ -22,37 +27,38 @@ const openIfClosed = (): void => {
 </script>
 
 <template>
-  <label class="search-field" :class="{ open: ui.searchOpen.value }">
-    <AppIcon name="search" :size="17" />
-    <input
-      v-model="ui.searchQuery.value"
-      type="search"
-      placeholder="搜索歌曲、歌手、专辑或歌单"
-      aria-label="搜索歌曲、歌手、专辑或歌单"
-      @focus="openIfClosed"
-      @click="openIfClosed"
-      @keydown.enter="openAllResults()"
-      @keydown.esc="dismissSearch()"
-    />
+  <div class="search-field" :class="{ open: ui.searchOpen.value }" @click="openIfClosed">
+    <label class="field-main">
+      <AppIcon name="search" :size="17" />
+      <input
+        v-model="ui.searchQuery.value"
+        type="search"
+        placeholder="搜索歌曲、歌手、专辑或歌单"
+        aria-label="搜索歌曲、歌手、专辑或歌单"
+        @focus="openIfClosed"
+        @keydown.enter="openAllResults()"
+        @keydown.esc="dismissSearch()"
+      />
+    </label>
     <button
       v-if="ui.searchOpen.value"
       class="esc-key"
       title="关闭搜索"
       aria-label="关闭搜索"
       @mousedown.prevent
-      @click="dismissSearch()"
+      @click.stop="dismissSearch()"
     >
       ESC
     </button>
     <kbd v-else>Ctrl K</kbd>
-  </label>
+  </div>
 </template>
 
 <style scoped>
 .search-field {
   position: relative;
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: center;
   justify-self: start;
@@ -68,6 +74,14 @@ const openIfClosed = (): void => {
     border-color var(--dur-1) ease,
     background var(--dur-1) ease,
     box-shadow var(--dur-1) ease;
+}
+/* 图标与输入框这一格：整格都是 label，点哪儿都能落焦到输入框 */
+.field-main {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
 }
 /* 顶部有一条窗口拖拽区，表单元素必须显式退出，否则点不动也选不中文字 */
 .search-field,

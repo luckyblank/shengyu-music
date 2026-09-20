@@ -34,13 +34,13 @@ const items = computed(() => ui.searchHistory.value.slice(0, MAX))
         </button>
       </span>
     </div>
-    <p v-else class="empty">还没有搜索记录，从下面的热门搜索开始也可以</p>
+    <p v-else class="empty">还没有搜索记录，从下面的热搜榜挑一个也行</p>
   </section>
 </template>
 
 <style scoped>
 .block {
-  margin-bottom: 22px;
+  min-width: 0;
 }
 
 .clear-btn {

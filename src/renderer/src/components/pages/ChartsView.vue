@@ -93,12 +93,19 @@ const localRows = computed(() => {
   return localNew.value
 })
 
-/** 一行说明数据口径 —— 本地榜与在线榜的排序依据完全不同，不写清楚容易被误读 */
-const metaLine = computed(() => {
-  if (tab.value === 'new') return '新歌榜 · 按加入曲库的时间排序 · 本地曲库'
-  if (tab.value === 'hot') return '热歌榜 · 按本地播放次数排序 · 本地曲库'
-  if (tab.value === 'like') return '收藏榜 · 你收藏过的曲目 · 本地曲库'
-  return `${online.currentChartNote.value} · Audius 官方趋势榜`
+/**
+ * 一行口径说明 —— 只讲表格本身看不出来的两件事：本地榜的排序依据，以及首次加载为何没有趋势。
+ * 它嵌在药丸行与表头之间，不额外占用设计稿的纵向节奏（见 .chart-tabs:has(+ .trend-note)）。
+ */
+const noteLine = computed(() => {
+  if (localTab.value) {
+    if (!localRows.value.length) return ''
+    if (tab.value === 'hot') return '热歌榜按本地播放次数排序 · 数据来自你的曲库'
+    if (tab.value === 'like') return '收藏榜只收录你收藏过的曲目 · 数据来自你的曲库'
+    return '新歌榜按加入曲库的时间排序 · 数据来自你的曲库'
+  }
+  if (online.hasTrendBase.value || !displayRows.value.length) return ''
+  return '首次加载这个榜单，还没有可对比的历史名次 —— 趋势列暂时显示「—」，明天起显示真实升降。'
 })
 
 /** 七天内加入曲库的本地曲目打「新歌」标；Track 没有发行日期，只能拿加入时间近似 */
@@ -252,12 +259,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
 
-    <p class="chart-meta">{{ metaLine }}</p>
-
-    <p v-if="!localTab && !online.hasTrendBase.value && displayRows.length" class="trend-note">
-      首次加载这个榜单，还没有可对比的历史名次 —— 趋势列显示 <code>—</code>，
-      明天再打开就会出现真实升降。新进榜的曲目标 <code>新歌</code>。
-    </p>
+    <p v-if="noteLine" class="trend-note">{{ noteLine }}</p>
 
     <div v-if="!localTab && online.chartLoading.value" class="state">
       <span class="spinner"></span>正在获取榜单…
@@ -400,7 +402,11 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  /* 药丸行下面到表头只有 6 + 一行说明 + 6 —— 合计约 28px，与设计稿的 28px 一致 */
+  /* 设计稿量出的节奏：药丸行底边到表头正好 28px */
+  margin-bottom: 28px;
+}
+/* 出现口径说明行时，把它挤进这 28px 里（6 + 18 + 4），表头位置不因此下移 */
+.chart-tabs:has(+ .trend-note) {
   margin-bottom: 6px;
 }
 .chart-tab {
@@ -483,28 +489,17 @@ onBeforeUnmount(() => {
   color: var(--brand);
 }
 
-.chart-meta {
-  /* 设计稿里药丸行与表头之间只有 28px，这行口径说明就挤在这段里，别把它撑高 */
-  margin-bottom: 6px;
-  color: var(--text-3);
-  font-size: 13px;
-  line-height: 1.3;
-}
-
+/* 说明行不参与设计稿的节奏：钉死 18px 高（6 + 18 + 4 = 28），
+   窗口极窄时用省略号收尾，而不是把表头推下去 */
 .trend-note {
-  margin-bottom: 6px;
-  padding: 10px 14px;
-  border-radius: var(--r-md);
+  overflow: hidden;
+  height: 18px;
+  margin-bottom: 4px;
   color: var(--text-2);
-  background: var(--surface-soft);
   font-size: 13px;
-  line-height: 1.6;
-}
-.trend-note code {
-  padding: 0 4px;
-  border-radius: var(--r-xs);
-  background: var(--surface);
-  font-family: var(--font-mono);
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* 表头与数据行共用 --chart-cols / --chart-col-gap，列宽才对得齐 */
